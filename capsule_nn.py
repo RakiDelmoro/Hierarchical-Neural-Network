@@ -45,4 +45,3 @@ input_feature = input.shape[-1]
 m = CapsuleNeuralNetwork(num_capsule_wide=4, feature_sizes=[5, 7, 13, 9, 5], input_feature_size=input_feature,
                          roll_each_layer=1)
 out = m(input)
-print(out)
