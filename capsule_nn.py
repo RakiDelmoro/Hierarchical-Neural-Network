@@ -17,33 +17,32 @@ class CapsuleNeuralNetwork(nn.Module):
         self.num_capsule_tall = input_feature_size // feature_sizes[0]
         self.num_capsule_wide = num_capsule_wide
         self.roll_each_layer = roll_each_layer
-
         self.output_probability = nn.Sequential(nn.Linear(15, 10, device="cuda"), nn.Softmax(-1))
 
     def forward(self, x: Tensor):
-        previous_features_output = x
+        previous_layer_output = x
         for _ in range(self.num_capsule_wide):
-            for _, layer in enumerate(self.layers):
+            for j, layer in enumerate(self.layers):
                 outputs = []
                 for i in range(self.num_capsule_tall):
-                    input_size = previous_features_output.shape[-1] // self.num_capsule_tall
+                    input_size = previous_layer_output.shape[-1] // self.num_capsule_tall
                     feature_view_start = i * input_size
                     feature_view_end = feature_view_start + input_size
-                    input_feature_view = previous_features_output[:, feature_view_start:feature_view_end]
+                    input_feature_view = previous_layer_output[:, feature_view_start:feature_view_end]
                     output = layer(input_feature_view)
                     outputs.append(output)
-                outputs.insert(0, outputs[-1][:, -self.roll_each_layer:])
-                previous_features_output = torch.concat(outputs, dim=1)[:, :-self.roll_each_layer]
-                outputs.clear()
-            previous_features_output = previous_features_output
-
-        return self.output_probability(previous_features_output)
+                if j % 2 == 0:
+                    outputs.append(outputs[0][:, :self.roll_each_layer])
+                    previous_layer_output = torch.concat(outputs, dim=1)[:, self.roll_each_layer:]
+                else:
+                    outputs.insert(0, outputs[-1][:, -self.roll_each_layer:])
+                    previous_layer_output = torch.concat(outputs, dim=1)[:, :-self.roll_each_layer]
+        
+        return self.output_probability(previous_layer_output)
 
 input = torch.randn(2, 15, device="cuda")
 input_feature = input.shape[-1]
 m = CapsuleNeuralNetwork(num_capsule_wide=4, feature_sizes=[5, 7, 13, 9, 5], input_feature_size=input_feature,
                          roll_each_layer=1)
-linear = nn.Sequential(nn.Linear(15, 10, device="cuda"), nn.Softmax(-1)).forward(input)
 out = m(input)
 print(out)
-print(linear)
