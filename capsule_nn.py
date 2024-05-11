@@ -56,33 +56,3 @@ class CapsuleNeuralNetwork(nn.Module):
         total_params = sum(p.numel() for p in self.output_probability.parameters() if p.requires_grad)
         print(f'Total parameters: {total_params*self.num_capsule_wide*self.num_capsule_tall}')
         print(f"Total Trainable Parameters: {total_params}")
-
-# input = torch.randn(2, 784, device="cuda")
-# input_feature = input.shape[-1]
-# m = CapsuleNeuralNetwork(num_capsule_wide=4, feature_sizes=[98, 196, 196, 196, 98], input_feature_size=input_feature,
-#                          roll_each_layer=1)
-# print(m(input))
-
-
-linear = nn.Sequential(
-    nn.Linear(15, 21, device="cuda"),
-    nn.Linear(21, 39, device="cuda"),
-    nn.Linear(39, 27, device="cuda"),
-    nn.Linear(27, 15, device="cuda"),
-
-    nn.Linear(15, 21, device="cuda"),
-    nn.Linear(21, 39, device="cuda"),
-    nn.Linear(39, 27, device="cuda"),
-    nn.Linear(27, 15, device="cuda"),
-
-    nn.Linear(15, 21, device="cuda"),
-    nn.Linear(21, 39, device="cuda"),
-    nn.Linear(39, 27, device="cuda"),
-    nn.Linear(27, 15, device="cuda"),
-
-    nn.Linear(15, 21, device="cuda"),
-    nn.Linear(21, 39, device="cuda"),
-    nn.Linear(39, 27, device="cuda"),
-    nn.Linear(27, 15, device="cuda"),
-    nn.Softmax(-1),
-    )
