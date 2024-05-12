@@ -24,7 +24,7 @@ class CapsuleNeuralNetworkV2(nn.Module):
     def forward(self, x: Tensor):
         previous_output = x
         for _ in range(self.capsule_wide):
-            for layer in self.layers:
+            for each in self.layers:
                 # batch | input feature -> batch | capsule tall | feature view
                 previous_output_new_shape = self.apply_capsule_tall_dim(previous_output)
                 # TODO: after getting a new shape apply a mechanism of each input feature view communicate each other
