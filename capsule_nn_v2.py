@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 from torch import Tensor
 
@@ -14,7 +15,7 @@ class CapsuleNeuralNetworkV2(nn.Module):
         self.output_probability = nn.Sequential(nn.Linear(feature_sizes[0], 10, device="cuda"), nn.Softmax(-1))
 
     def apply_capsule_tall_dim(self, x: Tensor):
-        assert x.shape[-1] % self.capsule_tall == 0, f"Input tensor expected to have a size ({x.shape[-1]}) that divides evenly by the first feature size ({self.capsule_tall})."
+        assert x.shape[-1] % self.capsule_tall == 0, f"Input tensor {x.shape[-1]} should divisible by {self.capsule_tall}"
         feature_view = x.shape[-1] // self.capsule_tall
 
         # batch | capsule tall | feature view
@@ -24,10 +25,12 @@ class CapsuleNeuralNetworkV2(nn.Module):
     def forward(self, x: Tensor):
         previous_output = x
         for _ in range(self.capsule_wide):
-            for each in self.layers:
+            for layer in self.layers:
                 # batch | input feature -> batch | capsule tall | feature view
                 previous_output_new_shape = self.apply_capsule_tall_dim(previous_output)
                 # TODO: after getting a new shape apply a mechanism of each input feature view communicate each other
                 # shape after each input view communicate -> batch | capsule tall*feature_view 
 
         return self.output_probability(previous_output)
+
+
