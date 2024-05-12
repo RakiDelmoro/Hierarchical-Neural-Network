@@ -15,7 +15,7 @@ class CapsuleNeuralNetworkV2(nn.Module):
         self.output_probability = nn.Sequential(nn.Linear(feature_sizes[0], 10, device="cuda"), nn.Softmax(-1))
 
     def apply_capsule_tall_dim(self, x: Tensor):
-        assert x.shape[-1] % self.capsule_tall == 0, f"Input tensor {x.shape[-1]} should divisible by {self.capsule_tall}"
+        assert x.shape[-1] % self.capsule_tall == 0, f"Input feature {x.shape[-1]} should divisible by {self.capsule_tall}"
         feature_view = x.shape[-1] // self.capsule_tall
 
         # batch | capsule tall | feature view
