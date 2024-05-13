@@ -1,2 +1,4 @@
 __pycache__/
 training-data
+checkpoint.tar
+micah_capsule.py
