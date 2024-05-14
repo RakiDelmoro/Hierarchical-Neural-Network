@@ -21,7 +21,7 @@ class CapsuleNeuralNetwork(nn.Module):
         self.num_capsule_wide = num_capsule_wide
         self.roll_each_layer = roll_each_layer
 
-        self.output_probability = nn.Sequential(nn.Linear(self.feature_sizes[-1]*self.num_capsule_tall, 10, device="cuda"), nn.Softmax(-1))
+        self.output_probability = nn.Sequential(nn.Linear(self.feature_sizes[-1]*self.num_capsule_tall, 10, device="cuda"))
 
     def forward(self, primary_input: Tensor):
         previous_layer_output = torch.zeros(size=(primary_input.shape[0], self.feature_sizes[0]*self.num_capsule_tall), device="cuda")

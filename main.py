@@ -27,10 +27,10 @@ def main():
     validation_dataset = TensorDataset(validation_input, validation_expected)
     validation_dataloader = DataLoader(validation_dataset, batch_size=1, shuffle=True)
 
-    model = CapsuleNeuralNetwork(num_capsule_wide=1, num_capsule_tall=16, feature_sizes=[32, 32, 32, 32, 32, 32], input_data_size=input_feature, roll_each_layer=1)
+    model = CapsuleNeuralNetwork(num_capsule_wide=1, num_capsule_tall=1, feature_sizes=[32, 32, 32, 32, 32, 32], input_data_size=input_feature, roll_each_layer=1)
     optimizer = torch.optim.AdamW(params=model.parameters(), lr=LEARNING_RATE)
     loss_func = torch.nn.CrossEntropyLoss()
 
-    runner(training_dataloader, validation_dataloader, model, optimizer, loss_func, EPOCHS)
+    runner(training_dataloader, validation_dataloader, model, optimizer, loss_func, EPOCHS, True)
 
 main()
