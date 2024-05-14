@@ -14,8 +14,8 @@ def train(model: torch.nn.Module, optimizer: optim.AdamW, loss_function: torch.n
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
         return loss
+
     losses = []
     for input_batch, expected_batch in dataloader:
         loss = train_one_batch(model, optimizer, input_batch, expected_batch, loss_function)
@@ -39,7 +39,7 @@ def validate(model: torch.nn.Module, loss_func, dataloader: DataLoader):
         else:
             predicted_and_expected = {'predicted': predicted, 'expected': expected_batch.item()}
             list_of_wrong_prediction.append(predicted_and_expected)
-    
+
     total_loss = losses / len(dataloader)
     return total_loss, list_of_correct_prediction, list_of_wrong_prediction
 
