@@ -49,6 +49,7 @@ def print_correct_prediction(correct_prediction_list, number_to_print):
         each_item = correct_prediction_list[i]
         predicted, expected = each_item['predicted'], each_item['expected']
         print(f"Predicted: {predicted} Expected: {expected}")
+
 def print_wrong_prediction(wrong_prediction_list, number_to_print):
     print("Wrong prediction!")
     for i in range(number_to_print):
