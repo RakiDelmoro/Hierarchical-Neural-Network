@@ -40,3 +40,4 @@ class CapsuleNeuralNetworkV2(nn.Module):
                 previous_output = torch.concat(view_outputs, dim=1)
 
         return self.output_decoder(previous_output)
+    
