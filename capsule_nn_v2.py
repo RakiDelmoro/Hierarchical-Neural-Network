@@ -1,4 +1,3 @@
-import math
 import torch
 import torch.nn as nn
 from torch import Tensor
@@ -6,7 +5,7 @@ from torch import Tensor
 class CapsuleNeuralNetworkV2(nn.Module):
     def __init__(self, feature_sizes, capsule_wide, capsule_tall):
         super().__init__()
-        self.layers = []
+        self.layers = nn.Sequential()
         for i in range(len(feature_sizes)-1):
             assert feature_sizes[i] % capsule_tall == 0, f"{capsule_tall} should divisible by {feature_sizes[i]}"
             input_feature_view = feature_sizes[i] // capsule_tall
@@ -15,8 +14,7 @@ class CapsuleNeuralNetworkV2(nn.Module):
             for _ in range(capsule_tall):
                 input_view_layer = nn.Linear(input_feature_view, output_feature_view, device="cuda")
                 capsule_tall_layer.append(input_view_layer)
-            layer = nn.Sequential(nn.Sequential(*capsule_tall_layer))
-            self.layers.append(layer)
+            self.layers.append(nn.Sequential(*capsule_tall_layer, nn.ReLU()))
 
         self.capsule_tall = capsule_tall
         self.capsule_wide = capsule_wide
@@ -34,11 +32,10 @@ class CapsuleNeuralNetworkV2(nn.Module):
         previous_output = x
         for _ in range(self.capsule_wide):
             for layer in self.layers:
-                capsule_tall_dim_applied = self.apply_capsule_tall_dim(previous_output)
+                input_feature_view = self.apply_capsule_tall_dim(previous_output)
                 view_outputs = []
-                for input_view in range(capsule_tall_dim_applied.shape[1]):
-                    each_layer = layer[0]
-                    output = each_layer[input_view](capsule_tall_dim_applied[:, input_view, :])
+                for view_idx in range(input_feature_view.shape[1]):
+                    output = layer[view_idx](input_feature_view[:, view_idx, :])
                     view_outputs.append(output)
                 previous_output = torch.concat(view_outputs, dim=1)
 
