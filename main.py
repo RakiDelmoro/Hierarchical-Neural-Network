@@ -4,7 +4,7 @@ import pickle
 from functools import partial
 from model_utils import runner
 from capsule_nn import CapsuleNeuralNetwork
-from capsule_nn_v2 import CapsuleNeuralNetworkV2
+from capsule_nn_v2 import CapsulePerceptron
 from torch.utils.data import TensorDataset, DataLoader
 from features import tensor
 
@@ -27,10 +27,10 @@ def main():
     validation_dataset = TensorDataset(validation_input, validation_expected)
     validation_dataloader = DataLoader(validation_dataset, batch_size=1, shuffle=True)
 
-    model = CapsuleNeuralNetwork(num_capsule_wide=1, num_capsule_tall=1, feature_sizes=[32, 32, 32, 32, 32, 32], input_data_size=input_feature, roll_each_layer=1)
+    model = CapsulePerceptron(feature_sizes=[input_feature, 2000, input_feature], capsule_wide=4, capsule_tall=4)
     optimizer = torch.optim.AdamW(params=model.parameters(), lr=LEARNING_RATE)
     loss_func = torch.nn.CrossEntropyLoss()
 
-    runner(training_dataloader, validation_dataloader, model, optimizer, loss_func, EPOCHS, True)
+    runner(training_dataloader, validation_dataloader, model, optimizer, loss_func, EPOCHS, False)
 
 main()
