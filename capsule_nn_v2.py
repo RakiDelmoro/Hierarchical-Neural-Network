@@ -44,7 +44,3 @@ class CapsulePerceptron(nn.Module):
                 previous_layer_output = self.view_layer(input_view, layer, layer_index)
 
         return self.output_layer(previous_layer_output)
-
-# x = torch.randn(1, 12, device="cuda")
-# m = CapsulePerceptron(feature_sizes=[12, 28, 28, 12], capsule_tall=4)
-# print(m(x))
