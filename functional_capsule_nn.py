@@ -18,7 +18,7 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
         input_feature = feature_sizes[i] + 1 if i != 0 else input_feature // capsule_tall + feature_sizes[0] + 1
         output_feature = feature_sizes[i+1]
         layer = linear_layer(input_feature, output_feature)
-        layers.extend(layer)
+        layers.append(layer)
 
     def feature_view(x: torch.Tensor):
         input_view = x.shape[-1] // capsule_tall
