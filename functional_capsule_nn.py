@@ -57,6 +57,6 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
 
     return model, parameters
 
-x = torch.randn(1, 10, device="cuda")
-m, param = capsule_neural_network([10, 10, 10], 10, 1, 1)
-print(m(x))
+# x = torch.randn(1, 10, device="cuda")
+# m, param = capsule_neural_network([10, 10, 10], 10, 1, 1)
+# print(m(x))
