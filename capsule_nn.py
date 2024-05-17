@@ -8,7 +8,7 @@ class CapsuleNeuralNetwork(nn.Module):
         # assert input_data_size % feature_sizes[0] == 0, f"Input tensor expected to have a size ({input_data_size}) that divides evenly by the first feature size ({feature_sizes[0]})."
         assert feature_sizes[0] == feature_sizes[-1], f"First ({feature_sizes[0]}) and last ({feature_sizes[-1]}) feature sizes need to be the same."
 
-        self.layers = []
+        self.layers = nn.ModuleList()
         for i in range(len(feature_sizes)-1):
             num_input_features = feature_sizes[i] + 1 if i != 0 else input_data_size // num_capsule_tall + feature_sizes[0] + 1
             num_output_features = feature_sizes[i+1]
