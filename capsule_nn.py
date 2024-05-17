@@ -21,8 +21,6 @@ class CapsuleNeuralNetwork(nn.Module):
         self.num_capsule_wide = num_capsule_wide
         self.roll_each_layer = roll_each_layer
 
-        self.output_probability = nn.Linear(self.feature_sizes[-1], 10, device="cuda")
-
     def forward(self, primary_input: Tensor):
         previous_layer_output = torch.zeros(size=(primary_input.shape[0], self.feature_sizes[0]*self.num_capsule_tall), device="cuda")
         for capsule_column_index in range(self.num_capsule_wide):
@@ -49,7 +47,7 @@ class CapsuleNeuralNetwork(nn.Module):
                     outputs.insert(0, outputs[-1][:, -self.roll_each_layer:])
                     previous_layer_output = torch.concat(outputs, dim=1)[:, :-self.roll_each_layer]
 
-        return self.output_probability(previous_layer_output)
+        return previous_layer_output
 
 # x = torch.randn(1, 784, device="cuda")
 # m = CapsuleNeuralNetwork(num_capsule_wide=4, num_capsule_tall=4, feature_sizes=[784, 2000, 784], input_data_size=784, roll_each_layer=1)
