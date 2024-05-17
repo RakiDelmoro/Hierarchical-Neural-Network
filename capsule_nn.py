@@ -21,28 +21,28 @@ class CapsuleNeuralNetwork(nn.Module):
         self.num_capsule_wide = num_capsule_wide
         self.roll_each_layer = roll_each_layer
 
-        self.output_probability = nn.Sequential(nn.Linear(self.feature_sizes[-1]*self.num_capsule_tall, 10, device="cuda"))
+        self.output_probability = nn.Linear(self.feature_sizes[-1], 10, device="cuda")
 
     def forward(self, primary_input: Tensor):
         previous_layer_output = torch.zeros(size=(primary_input.shape[0], self.feature_sizes[0]*self.num_capsule_tall), device="cuda")
-        for _ in range(self.num_capsule_wide):
-            for i, layer in enumerate(self.layers):
+        for capsule_column_index in range(self.num_capsule_wide):
+            for layer_index, layer in enumerate(self.layers):
                 outputs = []
-                for j in range(self.num_capsule_tall):
-                    input_size = self.feature_sizes[i]
-                    feature_view_start = j * input_size
+                for capsule_row_index in range(self.num_capsule_tall):
+                    input_size = self.feature_sizes[layer_index]
+                    feature_view_start = capsule_row_index * input_size
                     feature_view_end = feature_view_start + input_size
                     input_feature_view = previous_layer_output[:, feature_view_start:feature_view_end]
-                    input_to_next_layer = torch.concat([input_feature_view, torch.full([input_feature_view.shape[0], 1], i, device="cuda")], dim=1)
-                    if i == 0:
+                    input_to_next_layer = torch.concat([input_feature_view, torch.full([input_feature_view.shape[0], 1], capsule_column_index, device="cuda")], dim=1)
+                    if layer_index == 0:
                         primary_input_size = self.input_data_size // self.num_capsule_tall
-                        primary_input_view_start = j * primary_input_size
+                        primary_input_view_start = capsule_row_index * primary_input_size
                         primary_input_view_end = primary_input_view_start + primary_input_size
                         primary_input_view = primary_input[:, primary_input_view_start:primary_input_view_end]
                         input_to_next_layer = torch.concat([primary_input_view, input_to_next_layer], dim=1)
                     output = layer(input_to_next_layer)
                     outputs.append(output)
-                if i % 2 == 0:
+                if layer_index % 2 == 0:
                     outputs.append(outputs[0][:, :self.roll_each_layer])
                     previous_layer_output = torch.concat(outputs, dim=1)[:, self.roll_each_layer:]
                 else:
@@ -50,9 +50,7 @@ class CapsuleNeuralNetwork(nn.Module):
                     previous_layer_output = torch.concat(outputs, dim=1)[:, :-self.roll_each_layer]
 
         return self.output_probability(previous_layer_output)
-    
-    # Model Properties
-    def print_trainable_parameters(self):
-        total_params = sum(p.numel() for p in self.output_probability.parameters() if p.requires_grad)
-        print(f'Total parameters: {total_params*self.num_capsule_wide*self.num_capsule_tall}')
-        print(f"Total Trainable Parameters: {total_params}")
+
+# x = torch.randn(1, 784, device="cuda")
+# m = CapsuleNeuralNetwork(num_capsule_wide=4, num_capsule_tall=4, feature_sizes=[784, 2000, 784], input_data_size=784, roll_each_layer=1)
+# print(m(x))
