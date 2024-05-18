@@ -1,5 +1,7 @@
+import math
 import torch
 from torch import empty
+import torch.nn as nn
 from torch.nn import Parameter
 from torch.nn.functional import relu
 
@@ -7,7 +9,17 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
     def linear_layer(in_features: int, out_features: int, device: str="cuda"):
         weight = Parameter(empty((out_features, in_features), device=device))
         bias = Parameter(empty(out_features, device=device))
-        return lambda x: relu(torch.matmul(x, weight.t()) + bias), weight, bias
+        def linear_computation(x: torch.Tensor):
+            return relu(torch.matmul(x, weight.t()) + bias)
+        
+        def weight_and_bias_initialization():
+            nn.init.kaiming_uniform_(weight, a=math.sqrt(5))
+            fan_in, _ = nn.init._calculate_fan_in_and_fan_out(weight)
+            bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
+            nn.init.uniform_(bias, -bound, bound)
+
+        weight_and_bias_initialization() 
+        return linear_computation, weight, bias
 
     layers = []
     parameters: list[torch.nn.Parameter] = []
@@ -22,7 +34,7 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
         input_view = x.shape[-1] // capsule_tall
         new_input_shape = x.shape[:-1] + (capsule_tall, input_view)
         return x.view(new_input_shape)
-    
+
     def viewed_layer(x: torch.Tensor, layer, layer_idx: int):
         outputs = []
         for i in range(x.shape[1]):
@@ -41,7 +53,7 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
             for layer_idx, layer in enumerate(layers):
                 capsule_idx_as_tensor = torch.full([input_batch.shape[0], 1], capsule_wide_idx, device="cuda")
                 if layer_idx == 0:
-                    input_for_layer = torch.concat([previous_layer_output, capsule_idx_as_tensor, input_batch], dim=1)
+                    input_for_layer = torch.concat([input_batch, previous_layer_output, capsule_idx_as_tensor], dim=1)
                 else:
                     input_for_layer = torch.concat([previous_layer_output, capsule_idx_as_tensor], dim=1)
                 input_feature_view = feature_view(input_for_layer)
@@ -53,4 +65,4 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
 # x = torch.randn(1, 784, device="cuda")
 # m, param = capsule_neural_network([10, 2000, 10], 784, 1, 1)
 # print(m(x))
-# print(len(param))
+# print(param)
