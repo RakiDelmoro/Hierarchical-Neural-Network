@@ -10,10 +10,10 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
         return lambda x: relu(torch.matmul(x, weight.t()) + bias), weight, bias
 
     layers = []
-    parameters = []
+    parameters: list[torch.nn.Parameter] = []
     for i in range(len(feature_sizes)-1):
         input_feature = feature_sizes[i] + 1 if i != 0 else input_feature // capsule_tall + feature_sizes[0] + 1
-        output_feature = feature_sizes[i+1] // capsule_tall
+        output_feature = feature_sizes[i+1]
         layer, w, b = linear_layer(input_feature, output_feature)
         layers.append(layer)
         parameters.extend([w, b])
@@ -50,7 +50,7 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
 
     return forward_pass, parameters
 
-x = torch.randn(1, 784, device="cuda")
-m, param = capsule_neural_network([10, 2000, 10], 784, 1, 1)
-print(m(x))
-print(len(param))
+# x = torch.randn(1, 784, device="cuda")
+# m, param = capsule_neural_network([10, 2000, 10], 784, 1, 1)
+# print(m(x))
+# print(len(param))
