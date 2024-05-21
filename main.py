@@ -3,15 +3,15 @@ import torch
 import pickle
 from functools import partial
 from model_utils import runner
-from capsule_nn import CapsuleNeuralNetwork
-from capsule_nn_v2 import CapsulePerceptron
+from mlp import MultiLayerPerceptron
+from functional_capsule_nn import capsule_neural_network
 from torch.utils.data import TensorDataset, DataLoader
 from features import tensor
 
 def main():
     EPOCHS = 10000000
     BATCH_SIZE = 2048
-    LEARNING_RATE = 0.01
+    LEARNING_RATE = 0.0001
     WIDTH = 28
     HEIGHT = 28
 
@@ -26,9 +26,10 @@ def main():
     training_dataloader = DataLoader(training_dataset, batch_size=BATCH_SIZE, shuffle=True)
     validation_dataset = TensorDataset(validation_input, validation_expected)
     validation_dataloader = DataLoader(validation_dataset, batch_size=1, shuffle=True)
-
-    model = CapsulePerceptron(feature_sizes=[input_feature, 2000, input_feature], capsule_wide=4, capsule_tall=4)
-    optimizer = torch.optim.AdamW(params=model.parameters(), lr=LEARNING_RATE)
+    
+    model, parameters = capsule_neural_network(feature_sizes=[10, 2000, 10], input_feature=input_feature, capsule_tall=4, capsule_wide=1)
+    # model = MultiLayerPerceptron()
+    optimizer = torch.optim.AdamW(parameters, lr=LEARNING_RATE)
     loss_func = torch.nn.CrossEntropyLoss()
 
     runner(training_dataloader, validation_dataloader, model, optimizer, loss_func, EPOCHS, False)
