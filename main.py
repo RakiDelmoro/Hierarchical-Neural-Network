@@ -27,7 +27,7 @@ def main():
     validation_dataset = TensorDataset(validation_input, validation_expected)
     validation_dataloader = DataLoader(validation_dataset, batch_size=1, shuffle=True)
     
-    model, parameters = capsule_neural_network(feature_sizes=[10, 2000, 10], input_feature=input_feature, capsule_tall=4, capsule_wide=1)
+    model, parameters = capsule_neural_network(feature_sizes=[2000, 10], input_feature=input_feature, capsule_tall=1, capsule_wide=1, rotation_amount=1)
     # model = MultiLayerPerceptron()
     optimizer = torch.optim.AdamW(parameters, lr=LEARNING_RATE)
     loss_func = torch.nn.CrossEntropyLoss()
