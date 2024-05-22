@@ -17,8 +17,8 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
         parameters.extend([w, b])
     layers.insert(0, first_layer)
 
-    output_layer, w, b = linear_layer(feature_sizes[-1]*capsule_tall, 10)
-    parameters.extend([w, b])
+    # output_layer, w, b = linear_layer(feature_sizes[-1]*capsule_tall, 10)
+    # parameters.extend([w, b])
 
     def input_feature_view(x: torch.Tensor):
         assert x.shape[-1] % capsule_tall == 0, f'{capsule_tall} should divisible by {x.shape[-1]}'
@@ -39,7 +39,9 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
         for vertical_capsule_index in range(capsule_tall):
             view_features_for_capsule = input_for_layer[:, vertical_capsule_index, :]
             capsule_output = layer(view_features_for_capsule)
-            capsule_outputs.append(capsule_output)
+            # apply activation function to capsule output
+            output = relu(capsule_output)
+            capsule_outputs.append(output)
         return rotate_features(capsule_outputs, rotation_amount, layer_idx)
 
     def forward_pass(input_batch: torch.Tensor):
@@ -54,7 +56,7 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
                     previous_layer_output_viewed_feature = input_feature_view(previous_layer_output)
                     input_for_layer = torch.concat([previous_layer_output_viewed_feature, capsule_column_idx], dim=-1)
                 previous_layer_output = capsule_layer(input_for_layer, layer, layer_idx)
-        return previous_layer_output
+        return softmax(previous_layer_output, dim=-1)
     return forward_pass, parameters
 
 # x = torch.randn(1, 784, device="cuda")
