@@ -9,4 +9,5 @@ class MultiLayerPerceptron(nn.Module):
         self.second_layer = nn.Linear(2000, 10, device="cuda")
     def forward(self, x):
         first_layer_out = self.first_layer(x)
-        return softmax(self.second_layer(relu(first_layer_out)), dim=-1)
+        activation_output = relu(first_layer_out)
+        return softmax(self.second_layer(activation_output), dim=-1)

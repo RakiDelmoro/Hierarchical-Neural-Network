@@ -59,6 +59,6 @@ def capsule_neural_network(feature_sizes: list, input_feature: int, capsule_tall
         return softmax(previous_layer_output, dim=-1)
     return forward_pass, parameters
 
-# x = torch.randn(1, 784, device="cuda")
-# m, param = capsule_neural_network([2000, 10], 784, 1, 1, 1)
-# print(m(x))
+x = torch.randn(1, 784, device="cuda")
+m, param = capsule_neural_network([2000, 10], 784, 1, 1, 1)
+print(m(x))

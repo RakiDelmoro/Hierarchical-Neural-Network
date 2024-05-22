@@ -20,7 +20,7 @@ def main():
         ((training_input, training_expected), (validation_input, validation_expected), _) = pickle.load(file, encoding='latin-1')
 	# convert numpy arrays to torch tensors
     training_input, training_expected, validation_input, validation_expected = map(tensor, (training_input, training_expected, validation_input, validation_expected))
-    input_feature = HEIGHT * WIDTH
+    input_feature_size = HEIGHT * WIDTH
 
     training_dataset = TensorDataset(training_input, training_expected)
     training_dataloader = DataLoader(training_dataset, batch_size=BATCH_SIZE, shuffle=True)

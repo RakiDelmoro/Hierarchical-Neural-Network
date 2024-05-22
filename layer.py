@@ -10,7 +10,7 @@ def linear_layer(in_features: int, out_features: int, device: str="cuda"):
     bias = Parameter(empty(out_features, device=device))
 
     def linear_computation(x: torch.Tensor):
-        return relu(torch.matmul(x, weight.t()) + bias)
+        return torch.matmul(x, weight.t()) + bias
 
     def weight_and_bias_initialization():
         nn.init.kaiming_uniform_(weight, a=math.sqrt(5))
